@@ -7,3 +7,5 @@ RUN apt-get install -y clang
 RUN apt-get install -y make
 RUN apt-get install -y git
 RUN apt-get install -y vim
+
+CMD ["git", "clone", "https://github.com/Mohamed-JJ/simple-shell.git"]

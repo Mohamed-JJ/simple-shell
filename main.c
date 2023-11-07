@@ -54,20 +54,55 @@ void	clear_garbage(t_garbage **head)
 	}
 }
 
+char	**ft_split(char const *s, char c)
+{
+	char	**tab;
+	int		i;
+	int		j;
+	int		k;
+
+	if (!s)
+		return (NULL);
+	tab = malloc(sizeof(char *) * (strlen(s) + 1));
+	if (!tab)
+		return (NULL);
+	i = 0;
+	j = 0;
+	while (s[i])
+	{
+		while (s[i] && (s[i] == c))
+			i++;
+		k = i;
+		while (s[i] && (s[i] != c))
+			i++;
+		if (i > k)
+		{
+			tab[j] = malloc(sizeof(char) * (i - k + 1));
+			if (!tab[j])
+				return (NULL);
+			strlcpy(tab[j], s + k, i - k + 1);
+			j++;
+		}
+	}
+	tab[j] = NULL;
+	return (tab);
+}
+
 int main(int c, char **v, char **env)
 {
+	(void)c;
+	(void)env;
     while (1)
 	{
         char input[100];
 		char *inputdup = NULL;
         printf("%s: ", v[0]);
-        inputdup = fgets(input, sizeof(input), stdin);
+        fgets(input, sizeof(input), stdin);
+		inputdup = strdup(input);
 		addBackGarbage(&collector, inputdup);
 		if (inputdup == NULL)
-			return 0;
-        inputdup[strcspn(inputdup, "\n")] = '\0';
-        
-        printf("%s\n", inputdup);
+			return (1);
+        inputdup[strcspn(inputdup, "\n")] = '\0';        
 		clear_garbage(&collector);
     }
 
