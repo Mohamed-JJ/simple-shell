@@ -14,6 +14,7 @@ typedef	struct s_cmd
 }				t_cmd;
 
 
+
 typedef struct s_garbage
 {
 	void	*ptr;
