@@ -1,5 +1,15 @@
 #include "main.h"
 
+/**
+ * _return_join_path - joins a path with cmd name
+ *
+ * @cmd: command
+ * @env: environment variables
+ * @collector: garbage collector
+ *
+ * Return: /path/cmd
+ */
+
 char *_return_join_path(char *cmd, char **env, t_garbage *collector)
 {
 	char **paths;
@@ -29,6 +39,16 @@ char *_return_join_path(char *cmd, char **env, t_garbage *collector)
 	printf("%s: command not found\n", cmd);
 	return (NULL);
 }
+
+/**
+ * _get_args - get new arguments array
+ *
+ * @arr: array
+ *
+ * @collector: garbage collector
+ *
+ * Return: array of arguments
+ */
 
 char **_get_args(char **arr, t_garbage *collector)
 {
@@ -67,6 +87,15 @@ char **_get_args(char **arr, t_garbage *collector)
 	return (args);
 }
 
+/**
+ * _execute - execute command
+ *
+ * @cmd: command name
+ * @env: environment variables
+ * @collector: garbage collector
+ *
+ */
+
 void _execute(char **cmd, char **env, t_garbage *collector)
 {
 	pid_t pid;
@@ -96,6 +125,15 @@ void _execute(char **cmd, char **env, t_garbage *collector)
 	}
 }
 
+/**
+ * _check_input - check input and execute it if it exists
+ *
+ * @input: user input
+ * @env: environment variables
+ * @collector: garbage collector
+ *
+ */
+
 void _check_input(char *input, char **env, t_garbage *collector)
 {
 	char **tab;
@@ -118,6 +156,16 @@ void _check_input(char *input, char **env, t_garbage *collector)
 		_execute(tab, env, collector);
 	}
 }
+
+/**
+ * main - simple shell
+ *
+ * @ac: argument count
+ * @av: argument vector
+ * @env: environment variables
+ *
+ * Return: 0 on success, 1 on error
+ */
 
 int main(int ac, char **av, char **env)
 {
