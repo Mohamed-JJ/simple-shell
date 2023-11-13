@@ -9,18 +9,38 @@
 #include <stdbool.h>
 #include <sys/wait.h>
 
+/**
+ * struct s_cmd - represents a command
+ *
+ * @cmd: command to be exectued
+ *
+ * @args: array of arguments for the command
+ *
+ * @env: enviroment variables
+ *
+ * @out_files: output files
+ */
+
 typedef struct s_cmd
 {
-        char *cmd;
-        char **args;
-        char **env;
-        char **out_files;
+	char *cmd;
+	char **args;
+	char **env;
+	char **out_files;
 } t_cmd;
+
+/**
+ * struct s_garbage - garbage linked list item
+ *
+ * @ptr: pointer to the allocated memory to be cleaned
+ *
+ * @next: pointer to the next item in the list
+ */
 
 typedef struct s_garbage
 {
-        void *ptr;
-        struct s_garbage *next;
+	void *ptr;
+	struct s_garbage *next;
 } t_garbage;
 
 char *_strncpy(char *dest, const char *src, int n);
