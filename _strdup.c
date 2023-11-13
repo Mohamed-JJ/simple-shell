@@ -1,4 +1,4 @@
-#include "../main.h"
+#include "main.h"
 
 /**
  * _strdup - duplicates a string and returns the new copy
@@ -10,7 +10,7 @@
 
 char *_strdup(char *str)
 {
-	char *copy = malloc(sizeof(str));
+	char *copy = malloc(sizeof(char) * _strlen(str));
 	int i;
 
 	i = 0;
