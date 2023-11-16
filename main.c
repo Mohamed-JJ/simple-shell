@@ -8,7 +8,7 @@
  *
  */
 
-void	_print_error(char *cmd, char *message)
+void _print_error(char *cmd, char *message)
 {
 	write(STDERR_FILENO, cmd, _strlen(cmd));
 	write(STDERR_FILENO, message, _strlen(message));
@@ -20,11 +20,14 @@ void	_print_error(char *cmd, char *message)
  * @cmd: command
  * @env: environment variables
  * @collector: garbage collector
- *
+ * @status: status
  * Return: /path/cmd
  */
 
-char *_return_join_path(char *cmd, char **env, t_garbage *collector, int *status)
+char *_return_join_path(char *cmd,
+						char **env,
+						t_garbage *collector,
+						int *status)
 {
 	char **paths;
 	int i;
@@ -66,65 +69,17 @@ char *_return_join_path(char *cmd, char **env, t_garbage *collector, int *status
 }
 
 /**
- * _get_args - get new arguments array
- *
- * @arr: array
- *
- * @collector: garbage collector
- *
- * Return: array of arguments
- */
-
-char **_get_args(char **arr, t_garbage *collector)
-{
-	char **args;
-
-	args = NULL;
-	if (!arr[1])
-	{
-		args = malloc(sizeof(char *) * 2);
-		if (!args)
-			return (NULL);
-		args[0] = _strdup("");
-		args[1] = NULL;
-		add_back_garbage(&collector, args[0]);
-		add_back_garbage(&collector, args);
-	}
-	else
-	{
-		int i;
-		int j;
-
-		i = 0;
-		while (arr[i])
-			i++;
-		args = malloc(sizeof(char *) * (i));
-		if (!args)
-			return (NULL);
-		for (j = 0; j < i; j++)
-		{
-			args[j] = _strdup(arr[j]);
-			add_back_garbage(&collector, args[j]);
-		}
-		add_back_garbage(&collector, args);
-		args[i] = NULL;
-	}
-	return (args);
-}
-
-/**
  * _execute - execute command
  *
  * @cmd: command name
  * @env: environment variables
  * @collector: garbage collector
- *
+ * @status: status
  */
 
 void _execute(char **cmd, char **env, t_garbage *collector, int *status)
 {
 	pid_t pid;
-	// int status;
 	char *joined_path;
 
 	joined_path = _return_join_path(cmd[0], env, collector, status);
@@ -150,9 +105,8 @@ void _execute(char **cmd, char **env, t_garbage *collector, int *status)
 	{
 		waitpid(pid, status, 0);
 
-		if (WIFEXITED(status))
-			*status = WEXITSTATUS(status);
-
+		if (WIFEXITED(*status))
+			*status = WEXITSTATUS(*status);
 	}
 }
 
@@ -162,7 +116,7 @@ void _execute(char **cmd, char **env, t_garbage *collector, int *status)
  * @input: user input
  * @env: environment variables
  * @collector: garbage collector
- *
+ * @status: status
  */
 
 void _check_input(char *input, char **env, t_garbage *collector, int *status)
@@ -214,6 +168,7 @@ int main(int ac, char **av, char **env)
 		int code;
 		char *inputdup = NULL;
 		size_t inputSize = 0;
+
 		collector = NULL;
 
 		if (isatty(STDIN_FILENO))

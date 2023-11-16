@@ -59,5 +59,6 @@ char **ft_split(char const *s, char c);
 char *_getenv(char **env);
 int _builtin(char *cmd);
 int _execute_builtin(char **cmd, char **env);
+char **_get_args(char **arr, t_garbage *collector);
 
 #endif
