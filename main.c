@@ -1,7 +1,5 @@
 #include "main.h"
 
-t_garbage *collector;
-
 /**
  * _print_error - print error message in the STDERR_FILENO
  *
@@ -207,10 +205,11 @@ void _check_input(char *input, char **env, t_garbage *collector, int *status)
 int main(int ac, char **av, char **env)
 {
 	int status = 0;
-
 	(void)ac;
+
 	while (1)
 	{
+		t_garbage *collector;
 		char *input;
 		int code;
 		char *inputdup = NULL;
