@@ -26,7 +26,7 @@ void	_print_error(char *cmd, char *message)
  * Return: /path/cmd
  */
 
-char *_return_join_path(char *cmd, char **env, t_garbage *collector)
+char *_return_join_path(char *cmd, char **env, t_garbage *collector, int *status)
 {
 	char **paths;
 	int i;
@@ -38,6 +38,7 @@ char *_return_join_path(char *cmd, char **env, t_garbage *collector)
 		if (access(cmd, F_OK) == 0)
 			return (cmd);
 		_print_error(cmd, ": command not found\n");
+		*status = 127;
 		return (NULL);
 	}
 	paths = ft_split(_getenv(env), ':');
@@ -62,6 +63,7 @@ char *_return_join_path(char *cmd, char **env, t_garbage *collector)
 		}
 	}
 	_print_error(cmd, ": command not found\n");
+	*status = 127;
 	return (NULL);
 }
 
@@ -121,13 +123,13 @@ char **_get_args(char **arr, t_garbage *collector)
  *
  */
 
-void _execute(char **cmd, char **env, t_garbage *collector)
+void _execute(char **cmd, char **env, t_garbage *collector, int *status)
 {
 	pid_t pid;
-	int status;
+	// int status;
 	char *joined_path;
 
-	joined_path = _return_join_path(cmd[0], env, collector);
+	joined_path = _return_join_path(cmd[0], env, collector, status);
 	if (!joined_path)
 		return;
 	pid = fork();
@@ -148,7 +150,11 @@ void _execute(char **cmd, char **env, t_garbage *collector)
 	}
 	else
 	{
-		waitpid(pid, &status, 0);
+		waitpid(pid, status, 0);
+
+		if (WIFEXITED(status))
+			*status = WEXITSTATUS(status);
+
 	}
 }
 
@@ -161,7 +167,7 @@ void _execute(char **cmd, char **env, t_garbage *collector)
  *
  */
 
-void _check_input(char *input, char **env, t_garbage *collector)
+void _check_input(char *input, char **env, t_garbage *collector, int *status)
 {
 	char **tab;
 	int i;
@@ -181,11 +187,11 @@ void _check_input(char *input, char **env, t_garbage *collector)
 		if (_execute_builtin(tab, env) == 1)
 		{
 			clear_garbage(&collector);
-			exit(0);
+			exit(*status);
 		}
 	}
 	else
-		_execute(tab, env, collector);
+		_execute(tab, env, collector, status);
 }
 
 /**
@@ -200,23 +206,29 @@ void _check_input(char *input, char **env, t_garbage *collector)
 
 int main(int ac, char **av, char **env)
 {
+	int status = 0;
+
 	(void)ac;
 	while (1)
 	{
 		char *input;
+		int code;
 		char *inputdup = NULL;
 		size_t inputSize = 0;
 		collector = NULL;
 
-		printf("%s: ", av[0]);
-		if (!getline(&input, &inputSize, stdin))
-			exit(1);
+		if (isatty(STDIN_FILENO))
+			printf("%s: ", av[0]);
+		code = getline(&input, &inputSize, stdin);
+		if (code == -1)
+			exit(status);
+
 		inputdup = _strdup(input);
 		add_back_garbage(&collector, inputdup);
 		if (inputdup == NULL)
 			return (1);
 		inputdup[_strcspn(inputdup, "\n")] = '\0';
-		_check_input(inputdup, env, collector);
+		_check_input(inputdup, env, collector, &status);
 		clear_garbage(&collector);
 	}
 	return (0);
