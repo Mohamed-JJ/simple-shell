@@ -9,7 +9,7 @@
  *
  */
 
-void _execute_builtin(char **cmd, char **env)
+int _execute_builtin(char **cmd, char **env)
 {
 	int i;
 
@@ -17,9 +17,10 @@ void _execute_builtin(char **cmd, char **env)
 	if (!_strcmp(cmd[0], "cd"))
 	{
 		if (!cmd[1])
-			return;
+			return 0;
 		if (chdir(cmd[1]) == -1)
 			printf("cd: %s: No such file or directory\n", cmd[1]);
+		return 0;
 	}
 	if (!_strcmp(cmd[0], "env"))
 	{
@@ -28,5 +29,11 @@ void _execute_builtin(char **cmd, char **env)
 			printf("%s\n", env[i]);
 			i++;
 		}
+		return (0);
 	}
+	if (!_strcmp(cmd[0], "exit"))
+	{
+		return (1);
+	}
+	return (0);
 }

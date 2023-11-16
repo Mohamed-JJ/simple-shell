@@ -14,8 +14,15 @@ void    clear_garbage(t_garbage **head)
 	{
 		tmp = *head;
 		*head = (*head)->next;
-		free(tmp->ptr);
 		if (tmp)
+		{
+			if (tmp->ptr)
+			{
+				free(tmp->ptr);
+				tmp->ptr = NULL;
+			}
 			free(tmp);
+		}
 	}
+	(*head) = NULL;
 }

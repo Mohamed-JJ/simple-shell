@@ -57,7 +57,7 @@ void clear_garbage(t_garbage **head);
 char **ft_split_spaces(char const *s);
 char **ft_split(char const *s, char c);
 char *_getenv(char **env);
-bool _builtin(char *cmd);
-void _execute_builtin(char **cmd, char **env);
+int _builtin(char *cmd);
+int _execute_builtin(char **cmd, char **env);
 
 #endif

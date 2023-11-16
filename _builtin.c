@@ -8,13 +8,15 @@
  * Return: true / false
  */
 
-bool _builtin(char *cmd)
+int _builtin(char *cmd)
 {
 	if (!cmd[0])
-		return (false);
+		return (0);
 	if (!_strcmp(cmd, "cd"))
-		return (true);
+		return (1);
 	if (!_strcmp(cmd, "env"))
-		return (true);
-	return (false);
+		return (1);
+	if (!_strcmp(cmd, "exit"))
+		return (1);
+	return (0);
 }

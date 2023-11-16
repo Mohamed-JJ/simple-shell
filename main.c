@@ -1,5 +1,13 @@
 #include "main.h"
 
+t_garbage *collector;
+
+void	print_error(char *cmd, char *message)
+{
+	write(STDERR_FILENO, cmd, _strlen(cmd));
+	write(STDERR_FILENO, message, _strlen(message));
+}
+
 /**
  * _return_join_path - joins a path with cmd name
  *
@@ -15,6 +23,15 @@ char *_return_join_path(char *cmd, char **env, t_garbage *collector)
 	char **paths;
 	int i;
 
+	if (!cmd)
+		return (NULL);
+	if (cmd[0] == '/')
+	{
+		if (access(cmd, F_OK) == 0)
+			return (cmd);
+		print_error(cmd, ": command not found\n");
+		return (NULL);
+	}
 	paths = ft_split(_getenv(env), ':');
 	add_back_garbage(&collector, paths);
 	for (i = 0; paths[i]; i++)
@@ -36,7 +53,7 @@ char *_return_join_path(char *cmd, char **env, t_garbage *collector)
 				return (joined_path);
 		}
 	}
-	printf("%s: command not found\n", cmd);
+	print_error(cmd, ": command not found\n");
 	return (NULL);
 }
 
@@ -103,10 +120,12 @@ void _execute(char **cmd, char **env, t_garbage *collector)
 	char *joined_path;
 
 	joined_path = _return_join_path(cmd[0], env, collector);
+	if (!joined_path)
+		return;
 	pid = fork();
 	if (pid == -1)
 	{
-		printf("%s: Error: fork failed\n", cmd[0]);
+		print_error(cmd[0], ": Error: fork failed\n");
 		return;
 	}
 	if (pid == 0)
@@ -116,7 +135,7 @@ void _execute(char **cmd, char **env, t_garbage *collector)
 			char **args = _get_args(cmd, collector);
 
 			if (execve(joined_path, args, env) == -1)
-				printf("%s: Error: execve failed\n", cmd[0]);
+				print_error(cmd[0], ": Error: execve failed\n");
 		}
 	}
 	else
@@ -150,11 +169,15 @@ void _check_input(char *input, char **env, t_garbage *collector)
 	if (_strcmp(tab[0], "exit") == 0)
 		exit(0);
 	if (_builtin(tab[0]))
-		_execute_builtin(tab, env);
-	else
 	{
-		_execute(tab, env, collector);
+		if (_execute_builtin(tab, env) == 1)
+		{
+			clear_garbage(&collector);
+			exit(0);
+		}
 	}
+	else
+		_execute(tab, env, collector);
 }
 
 /**
@@ -170,19 +193,17 @@ void _check_input(char *input, char **env, t_garbage *collector)
 int main(int ac, char **av, char **env)
 {
 	(void)ac;
-	(void)env;
 	while (1)
 	{
 		char *input;
 		char *inputdup = NULL;
 		size_t inputSize = 0;
-		t_garbage *collector = NULL;
+		collector = NULL;
 
 		printf("%s: ", av[0]);
 		if (!getline(&input, &inputSize, stdin))
 			return (1);
 		inputdup = _strdup(input);
-		add_back_garbage(&collector, input);
 		add_back_garbage(&collector, inputdup);
 		if (inputdup == NULL)
 			return (1);
