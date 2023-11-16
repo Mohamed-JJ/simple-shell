@@ -2,7 +2,15 @@
 
 t_garbage *collector;
 
-void	print_error(char *cmd, char *message)
+/**
+ * _print_error - print error message in the STDERR_FILENO
+ *
+ * @cmd: command
+ * @message: error message
+ *
+ */
+
+void	_print_error(char *cmd, char *message)
 {
 	write(STDERR_FILENO, cmd, _strlen(cmd));
 	write(STDERR_FILENO, message, _strlen(message));
@@ -29,7 +37,7 @@ char *_return_join_path(char *cmd, char **env, t_garbage *collector)
 	{
 		if (access(cmd, F_OK) == 0)
 			return (cmd);
-		print_error(cmd, ": command not found\n");
+		_print_error(cmd, ": command not found\n");
 		return (NULL);
 	}
 	paths = ft_split(_getenv(env), ':');
@@ -53,7 +61,7 @@ char *_return_join_path(char *cmd, char **env, t_garbage *collector)
 				return (joined_path);
 		}
 	}
-	print_error(cmd, ": command not found\n");
+	_print_error(cmd, ": command not found\n");
 	return (NULL);
 }
 
@@ -125,7 +133,7 @@ void _execute(char **cmd, char **env, t_garbage *collector)
 	pid = fork();
 	if (pid == -1)
 	{
-		print_error(cmd[0], ": Error: fork failed\n");
+		_print_error(cmd[0], ": Error: fork failed\n");
 		return;
 	}
 	if (pid == 0)
@@ -135,7 +143,7 @@ void _execute(char **cmd, char **env, t_garbage *collector)
 			char **args = _get_args(cmd, collector);
 
 			if (execve(joined_path, args, env) == -1)
-				print_error(cmd[0], ": Error: execve failed\n");
+				_print_error(cmd[0], ": Error: execve failed\n");
 		}
 	}
 	else
@@ -202,7 +210,7 @@ int main(int ac, char **av, char **env)
 
 		printf("%s: ", av[0]);
 		if (!getline(&input, &inputSize, stdin))
-			return (1);
+			exit(1);
 		inputdup = _strdup(input);
 		add_back_garbage(&collector, inputdup);
 		if (inputdup == NULL)
